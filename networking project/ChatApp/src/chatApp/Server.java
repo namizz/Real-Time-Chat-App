@@ -24,7 +24,7 @@ public class Server {
             socket = serverSocket.accept(); // accepting client request and forming link
             System.out.println("client request accepted");
 
-            input = new DataInputStream(new BufferedInputStream(System.in));
+            input = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
 
         }catch(IOException ioE){
             ioE.printStackTrace();
