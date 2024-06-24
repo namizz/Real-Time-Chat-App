@@ -1,4 +1,5 @@
-package net.
+package chatApp;
+
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
