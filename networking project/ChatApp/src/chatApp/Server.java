@@ -11,6 +11,7 @@ public class Server {
     private ServerSocket serverSocket = null;//serverSocket
     private Socket socket = null;
     private DataInputStream input = null;
+    private 
 
     public Server(int port){
         //sets  for the server and initiate Socket from the server socket and input streams to read information from
@@ -31,12 +32,9 @@ public class Server {
         }
     }
 
-
-
     public void closeConnection() {
 
         //to close every connection that has been made and every I/O stream opened
-
         try {
             serverSocket.close();
             socket.close();
