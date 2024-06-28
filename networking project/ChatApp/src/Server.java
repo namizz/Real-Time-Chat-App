@@ -24,10 +24,15 @@ public class Server {
             System.out.println("client request accepted");
 
             input = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+            String line;
+                while((line = input.readUTF()) != null){
+                    System.out.println(line); //prints the message
 
-        }catch(IOException ioE){
+                };
+
+            }catch(IOException ioE){
             ioE.printStackTrace();
-        }
+            }
     }
 
     public void closeConnection() {
@@ -59,20 +64,20 @@ public class Server {
 //     public void ServerCode(){
 //         try {
 //             ServerSocket serverSocket = new ServerSocket(4518);
-//             while (true) {
-//                 Socket sock = serverSocket.accept();// socket from The client
-//                 System.out.println("Client connected.");
-                
-//                 InputStreamReader read = new InputStreamReader(sock.getInputStream());//reads from connected socket
-//                 reader = new BufferedReader(read);// buffers the message
-//                 String line;
-//                 while((line = reader.readLine()) != null){
-//                     System.out.println(line); //prints the message
+           
+//             Socket sock = serverSocket.accept();// socket from The client
+//             System.out.println("Client connected.");
+            
+//             InputStreamReader read = new InputStreamReader(sock.getInputStream());//reads from connected socket
+//             reader = new BufferedReader(read);// buffers the message
+//             String line;
+//             while((line = reader.readLine()) != null){
+//                 System.out.println(line); //prints the message
 
-//                 };//assign the message
-//             }           
+//             };//assign the message
+                       
                         
-//         } catch (Exception e) {
+//         } catch (IOException e) {
 //             e.printStackTrace();
 //         }
         
