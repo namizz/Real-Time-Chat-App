@@ -1,20 +1,20 @@
 package chatApp;
 
+import java.io.*;
 import java.net.*;
 import javax.swing.JOptionPane;
-import java.io.*;
 
 public class Client {
     PrintWriter writer;
     BufferedReader reader;
     Socket sock;
-    // public static void main(String[] args) {
-    //     new Client().ClientCode();
+    public static void main(String[] args) {
+        new Client().ClientCode();
         
-    // }
+    }
     public void ClientCode(){
         try {
-            sock = new Socket("127.0.0.1", 4518);//connects with the server
+            sock = new Socket("127.0.0.1", 1500);//connects with the server
             writer = new PrintWriter(sock.getOutputStream());//write on the OutputStraem of the Socket
             writer.println("hi server");//writing on the socket outputstream
             writer.flush();
