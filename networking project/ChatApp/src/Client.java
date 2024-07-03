@@ -23,6 +23,7 @@ public class Client {
             InputStreamReader read = new InputStreamReader(sock.getInputStream());//reads the message on the socket
             reader = new BufferedReader(read);//buffer the message
             Thread readd = new Thread(new read_message());
+            readd.start();
 
         } catch (IOException e) {
             e.printStackTrace();
