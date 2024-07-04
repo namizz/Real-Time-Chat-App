@@ -52,6 +52,8 @@ public class Server {
     private void readMessage() throws IOException{
         //receives message from network and prints to console
         String read = input.readLine();
+
+        //checks whether the read is only whitespace and if not assigns to messageFromClient and prints on console
         if(!read.isBlank()){
             messageFromClient = read;
             System.out.println(messageFromClient);
@@ -59,28 +61,52 @@ public class Server {
         messageFromClient = "";
     }
 
-    private  void closeConnection() {
+    private  void closeConnection() throws IOException {
         //to close every connection that has been made and every I/O stream opened
-        try {
             serverSocket.close();
             socket.close();
             input.close();
-        } catch (IOException ioE) {
-            System.out.println(ioE.getMessage());
-        }
     }
     public void run(){
-        try{
-            while(!messageFromClient.equals("Over")){
-                readMessage();
-                writeMessage();
-            }
-            closeConnection();
-        }catch(IOException ioE){
-                ioE.printStackTrace();
+            Thread messageWriter = new MessageWriter();
+            Thread messageReceiver = new MessageReceiver();
+
+            messageReceiver.start();
+            messageWriter.start();
+            
+            while(true){
+                if(messageFromClient.equals("Over")){
+                    try {
+                        closeConnection();
+                    } catch (IOException e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
             }
     }
+
     public static void main(String[] args){
         new Server(1500).run();
+    }
+
+    private class MessageReceiver extends Thread{
+        @Override
+        public void run(){
+            try {
+                while(true)readMessage();
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+    private class MessageWriter extends Thread{
+        @Override
+        public void run(){
+            try{
+                while(true)writeMessage();
+            }catch(IOException ioe){
+                System.out.println(ioe.getMessage());
+            }
+        }
     }
 }
