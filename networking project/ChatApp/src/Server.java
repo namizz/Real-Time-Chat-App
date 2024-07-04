@@ -1,7 +1,9 @@
-
-import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -9,7 +11,10 @@ public class Server {
     private int port = 0;// initializing port for the server
     private ServerSocket serverSocket = null;//serverSocket
     private Socket socket = null;
-    private DataInputStream input = null;
+    private BufferedReader input = null;
+    private BufferedWriter writer = null;
+    private String messageFromClient = "";
+    private String messageToClient = ""; 
 
     public Server(int port){
         //sets  for the server and initiate Socket from the server socket and input streams to read information from
@@ -23,58 +28,83 @@ public class Server {
             socket = serverSocket.accept(); // accepting client request and forming link
             System.out.println("client request accepted");
 
-            input = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-
+            input = new BufferedReader(new InputStreamReader(socket.getInputStream()));// reader from network or socket
+            writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));// writes to network
         }catch(IOException ioE){
             ioE.printStackTrace();
         }
     }
 
-    public void closeConnection() {
+    private void writeMessage() throws IOException{
+        // scans the console and writes message to network
 
+        //input stream to read from console/terminal
+        DataInputStream consoleScan = new DataInputStream(System.in);
+        String scannedString = consoleScan.readUTF();
+
+        //writes messageToClient onto the network if it isn't whiteSpace only
+        if (!scannedString.isBlank())writer.write(messageToClient); 
+        messageToClient = "";
+    }
+
+    private void readMessage() throws IOException{
+        //receives message from network and prints to console
+        String read = input.readLine();
+
+        //checks whether the read is only whitespace and if not assigns to messageFromClient and prints on console
+        if(!read.isBlank()){
+            messageFromClient = read;
+            System.out.println(messageFromClient);
+        }
+        messageFromClient = "";
+    }
+
+    private  void closeConnection() throws IOException {
         //to close every connection that has been made and every I/O stream opened
-        try {
             serverSocket.close();
             socket.close();
             input.close();
-        } catch (IOException ioE) {
-            System.out.println(ioE.getMessage());
+    }
+    public void run(){
+            Thread messageWriter = new MessageWriter();
+            Thread messageReceiver = new MessageReceiver();
+
+            messageReceiver.start();
+            messageWriter.start();
+            
+            while(true){
+                if(messageFromClient.equals("Over")){
+                    try {
+                        closeConnection();
+                    } catch (IOException e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
+            }
+    }
+
+    public static void main(String[] args){
+        new Server(1500).run();
+    }
+
+    private class MessageReceiver extends Thread{
+        @Override
+        public void run(){
+            try {
+                while(true)readMessage();
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
-    public static void main(String[] args) throws Exception {
-        new Server(4518);
+    private class MessageWriter extends Thread{
+        @Override
+        public void run(){
+            try{
+                while(true)writeMessage();
+            }catch(IOException ioe){
+                System.out.println(ioe.getMessage());
+            }
+        }
     }
 }
-// import java.net.*;
-
-
-// import java.io.*;
-// public class Server {
-//     BufferedReader reader;
-//     public static void main(String[] args){
-//         new Server().ServerCode();
-
-        
-//     }
-//     public void ServerCode(){
-//         try {
-//             ServerSocket serverSocket = new ServerSocket(4518);
-//             while (true) {
-//                 Socket sock = serverSocket.accept();// socket from The client
-//                 System.out.println("Client connected.");
-                
-//                 InputStreamReader read = new InputStreamReader(sock.getInputStream());//reads from connected socket
-//                 reader = new BufferedReader(read);// buffers the message
-//                 String line;
-//                 while((line = reader.readLine()) != null){
-//                     System.out.println(line); //prints the message
-
-//                 };//assign the message
-//             }           
-                        
-//         } catch (Exception e) {
-//             e.printStackTrace();
-//         }
-        
-//     }
-// }
