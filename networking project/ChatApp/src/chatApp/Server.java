@@ -37,7 +37,7 @@ public class Server {
         }
     }
 
-    private void writeMessage()throws IOException{
+    private void writeMessage() throws IOException{
         // scans the console and writes message to network
 
         //input stream to read from console/terminal
@@ -52,8 +52,10 @@ public class Server {
     private void readMessage() throws IOException{
         //receives message from network and prints to console
         String read = input.readLine();
-        if(!read.isBlank())messageFromClient = read;
-        System.out.println(messageFromClient);
+        if(!read.isBlank()){
+            messageFromClient = read;
+            System.out.println(messageFromClient);
+        }
         messageFromClient = "";
     }
 
@@ -78,7 +80,7 @@ public class Server {
                 ioE.printStackTrace();
             }
     }
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args){
         new Server(1500).run();
     }
 }
