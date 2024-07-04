@@ -1,8 +1,12 @@
 package chatApp;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -11,7 +15,7 @@ public class Server {
     private ServerSocket serverSocket = null;//serverSocket
     private Socket socket = null;
     private BufferedReader input = null;
-    
+    private BufferedWriter writer = null;
     private String messageFromClient = "";
 
     public Server(int port){
@@ -26,31 +30,28 @@ public class Server {
             socket = serverSocket.accept(); // accepting client request and forming link
             System.out.println("client request accepted");
 
-            input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
-            try{while(!messageFromClient.equals("Over")){
-                readMessage();
-            }}catch(IOException ioE){
-                ioE.printStackTrace();
-            }
-
+            input = new BufferedReader(new InputStreamReader(socket.getInputStream()));// reader from network or socket
+            writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));// writes to network
         }catch(IOException ioE){
             ioE.printStackTrace();
         }
     }
 
-    public void writeMessage()throws IOException{
+    private void writeMessage()throws IOException{
         // scans the console and writes message to network
+        DataInputStream consoleScan = new DataInputStream(System.in);
+        String messageToClient = consoleScan.readUTF();
+        writer.write(messageToClient);
     }
 
-    public void readMessage() throws IOException{
+    private void readMessage() throws IOException{
         //receives message from network and prints to console
             String read = input.readLine();
             if(!read.isEmpty())messageFromClient = read;
         System.out.println(messageFromClient);
     }
 
-    public void closeConnection() {
+    private  void closeConnection() {
 
         //to close every connection that has been made and every I/O stream opened
         try {
@@ -60,6 +61,16 @@ public class Server {
         } catch (IOException ioE) {
             System.out.println(ioE.getMessage());
         }
+    }
+    public void run(){
+        try{while(!messageFromClient.equals("Over")){
+                readMessage();
+                writeMessage();
+            }
+            closeConnection();
+        }catch(IOException ioE){
+                ioE.printStackTrace();
+            }
     }
     public static void main(String[] args) throws Exception {
         new Server(1500);
