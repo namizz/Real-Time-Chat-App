@@ -1,6 +1,5 @@
 package chatApp;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
@@ -17,6 +16,7 @@ public class Server {
     private BufferedReader input = null;
     private BufferedWriter writer = null;
     private String messageFromClient = "";
+    private String messageToClient = ""; 
 
     public Server(int port){
         //sets  for the server and initiate Socket from the server socket and input streams to read information from
@@ -39,20 +39,25 @@ public class Server {
 
     private void writeMessage()throws IOException{
         // scans the console and writes message to network
+
+        //input stream to read from console/terminal
         DataInputStream consoleScan = new DataInputStream(System.in);
-        String messageToClient = consoleScan.readUTF();
-        writer.write(messageToClient);
+        String scannedString = consoleScan.readUTF();
+
+        //writes messageToClient onto the network if it isn't whiteSpace only
+        if (!scannedString.isBlank())writer.write(messageToClient); 
+        messageToClient = "";
     }
 
     private void readMessage() throws IOException{
         //receives message from network and prints to console
-            String read = input.readLine();
-            if(!read.isEmpty())messageFromClient = read;
+        String read = input.readLine();
+        if(!read.isBlank())messageFromClient = read;
         System.out.println(messageFromClient);
+        messageFromClient = "";
     }
 
     private  void closeConnection() {
-
         //to close every connection that has been made and every I/O stream opened
         try {
             serverSocket.close();
@@ -63,7 +68,8 @@ public class Server {
         }
     }
     public void run(){
-        try{while(!messageFromClient.equals("Over")){
+        try{
+            while(!messageFromClient.equals("Over")){
                 readMessage();
                 writeMessage();
             }
@@ -73,6 +79,6 @@ public class Server {
             }
     }
     public static void main(String[] args) throws Exception {
-        new Server(1500);
+        new Server(1500).run();
     }
 }
