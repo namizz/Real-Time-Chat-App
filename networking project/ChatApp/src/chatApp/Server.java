@@ -1,11 +1,10 @@
 package chatApp;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -13,8 +12,8 @@ public class Server {
     private int port = 0;// initializing port for the server
     private ServerSocket serverSocket = null;//serverSocket
     private Socket socket = null;
-    private BufferedReader input = null;
-    private BufferedWriter writer = null;
+    private DataInputStream input = null;
+    private DataOutputStream writer = null;
     private String messageFromClient = "";
     private String messageToClient = ""; 
 
@@ -30,8 +29,8 @@ public class Server {
             socket = serverSocket.accept(); // accepting client request and forming link
             System.out.println("client request accepted");
 
-            input = new BufferedReader(new InputStreamReader(socket.getInputStream()));// reader from network or socket
-            writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));// writes to network
+            input = new DataInputStream(socket.getInputStream());//reader from network or socket
+            writer = new DataOutputStream(socket.getOutputStream());// writes to network
         }catch(IOException ioE){
             ioE.printStackTrace();
         }
@@ -39,26 +38,29 @@ public class Server {
 
     private void writeMessage() throws IOException{
         // scans the console and writes message to network
-
+        
         //input stream to read from console/terminal
-        DataInputStream consoleScan = new DataInputStream(System.in);
-        String scannedString = consoleScan.readUTF();
-
+        BufferedReader consoleScan = new BufferedReader(new InputStreamReader(System.in));
+        messageToClient = consoleScan.readLine();
+        
         //writes messageToClient onto the network if it isn't whiteSpace only
-        if (!scannedString.isBlank())writer.write(messageToClient); 
+        if (!messageToClient.isBlank()){
+            writer.writeUTF(messageToClient);
+        }
         messageToClient = "";
     }
 
     private void readMessage() throws IOException{
+        BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        
         //receives message from network and prints to console
-        String read = input.readLine();
-
+        messageFromClient = reader.readLine();
+        
         //checks whether the read is only whitespace and if not assigns to messageFromClient and prints on console
-        if(!read.isBlank()){
-            messageFromClient = read;
-            System.out.println(messageFromClient);
+        if(!messageFromClient.isBlank()){
+            System.out.println("Client: " + messageFromClient);
         }
-        messageFromClient = "";
+        messageFromClient = "";//resetting message from client to
     }
 
     private  void closeConnection() throws IOException {
