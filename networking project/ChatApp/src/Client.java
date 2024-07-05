@@ -8,10 +8,9 @@ public class Client {
     DataInputStream reader;
     Socket sock;
     public static void main(String[] args) {
-        new Client().ClientCode(1500);
-        
+        new Client().clientCode(1500);   
     }
-    public void ClientCode(int port){
+    public void clientCode(int port){
         try {
             //connects with the server
             sock = new Socket("127.0.0.1", port);
@@ -19,7 +18,6 @@ public class Client {
             writer = new PrintWriter(sock.getOutputStream());
             
             //object to read from socket
-           // InputStreamReader read = new InputStreamReader(sock.getInputStream());//reads the message on the socket
             reader = new DataInputStream(sock.getInputStream());//buffer the message
             Thread readd = new Thread(new read_message());
             Thread writeThread = new Thread(()->{while(true)write();});
@@ -35,12 +33,10 @@ public class Client {
     public void write(){
         Scanner scan = new Scanner(System.in);
         String message= null;
-        //check here there is a while loop that might bring trouble when the client is reads message from the socket
         
         message = scan.nextLine();
         try {
             if(!message.isBlank()){
-                System.out.print("you: " + message);
                 writer.println(message);
                 writer.flush();}
         } catch (Exception e) {
